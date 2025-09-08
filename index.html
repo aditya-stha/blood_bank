@@ -44,12 +44,13 @@
     Tabletop.init({
       key: publicSpreadsheetUrl,
       callback: data => {
+        console.log(data);  
         bloodData = data.map(d => ({
           name: d.Name,
           type: d.Type,
           bloodType: d['Blood Type'],
           contact: d.Contact,
-          location: d.Location
+          location: d.Location,
           entryTime: d['Entry Time']
         }));
       },

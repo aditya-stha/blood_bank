@@ -37,7 +37,7 @@
 <div id="results"></div>
 
 <script>
-  const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2aYOgftmgyig8mOQdQxw4prJZyAP18yM2CB2gPjyv8p3D_6kgvbOfipPoDgb_oh3DN-_8os6j84Uo/pub?output=csv'; // replace with your CSV link
+  const csvUrl = 'YOUR_CSV_LINK_HERE'; // replace with your published Google Sheet CSV link
   let bloodData = [];
 
   // Load CSV from Google Sheets
@@ -45,7 +45,17 @@
     download: true,
     header: true,
     complete: function(results) {
-      bloodData = results.data;
+      // Remove empty rows and trim spaces
+      bloodData = results.data
+        .filter(d => d['Blood Type']) 
+        .map(d => ({
+          Name: d.Name ? d.Name.trim() : '',
+          Type: d.Type ? d.Type.trim() : '',
+          BloodType: d['Blood Type'] ? d['Blood Type'].trim() : '',
+          Contact: d.Contact ? d.Contact.trim() : '',
+          Location: d.Location ? d.Location.trim() : '',
+          EntryTime: d['Entry Time'] ? d['Entry Time'].trim() : ''
+        }));
       console.log('Loaded data:', bloodData);
     }
   });
@@ -54,7 +64,7 @@
     const type = document.getElementById('bloodType').value;
     if (!type) return alert('Please select a blood type');
 
-    const matches = bloodData.filter(d => d['Blood Type'] === type);
+    const matches = bloodData.filter(d => d.BloodType === type);
 
     const resultsDiv = document.getElementById('results');
     if(matches.length === 0){
@@ -68,7 +78,7 @@
                 <strong>${d.Name}</strong> <br>
                 ${d.Type} - ${d.Location} <br>
                 Contact: <a href="tel:${d.Contact}">${d.Contact}</a>
-                <small>Added on: ${d['Entry Time']}</small>
+                <small>Added on: ${d.EntryTime}</small>
                </li>`;
     });
     html += '</ul>';

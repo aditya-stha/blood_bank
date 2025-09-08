@@ -36,11 +36,11 @@
   <div id="results"></div>
 
   <script>
-    const publicSpreadsheetUrl = 'YOUR_GOOGLE_SHEET_PUBLISHED_URL';
+    const publicSpreadsheetUrl = 'GOOGLE_SHEET_PUBLISHED_URL';
 
     let bloodData = [];
 
-    // Load Google Sheet data using Tabletop.js
+ 
     Tabletop.init({
       key: publicSpreadsheetUrl,
       callback: data => {
@@ -50,6 +50,7 @@
           bloodType: d['Blood Type'],
           contact: d.Contact,
           location: d.Location
+          entryTime: d['Entry Time']
         }));
       },
       simpleSheet: true
@@ -73,6 +74,7 @@
                   <strong>${d.name}</strong> <br>
                   ${d.type} - ${d.location} <br>
                   Contact: <a href="tel:${d.contact}">${d.contact}</a>
+                  <small>Added on: ${d.entryTime}</small>
                  </li>`;
       });
       html += '</ul>';

@@ -4,85 +4,78 @@
   <title>Blood Bank Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/src/tabletop.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body { padding: 1rem; font-size: 1rem; }
     h1 { font-size: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
     button { width: 100%; font-size: 1.2rem; }
     #results { margin-top: 1rem; }
+    small { display: block; color: gray; margin-top: 0.3rem; }
   </style>
 </head>
 <body>
 
-  <h1>Find Blood Donors & Hospitals</h1>
+<h1>Find Blood Donors & Hospitals</h1>
 
-  <div class="mb-3">
-    <label for="bloodType" class="form-label">Select Blood Type:</label>
-    <select id="bloodType" class="form-select form-select-lg">
-      <option value="">--Choose--</option>
-      <option value="A+">A+</option>
-      <option value="A-">A-</option>
-      <option value="B+">B+</option>
-      <option value="B-">B-</option>
-      <option value="AB+">AB+</option>
-      <option value="AB-">AB-</option>
-      <option value="O+">O+</option>
-      <option value="O-">O-</option>
-    </select>
-  </div>
+<div class="mb-3">
+  <label for="bloodType" class="form-label">Select Blood Type:</label>
+  <select id="bloodType" class="form-select form-select-lg">
+    <option value="">--Choose--</option>
+    <option value="A+">A+</option>
+    <option value="A-">A-</option>
+    <option value="B+">B+</option>
+    <option value="B-">B-</option>
+    <option value="AB+">AB+</option>
+    <option value="AB-">AB-</option>
+    <option value="O+">O+</option>
+    <option value="O-">O-</option>
+  </select>
+</div>
 
-  <button onclick="searchBlood()" class="btn btn-primary mb-3">Search</button>
+<button onclick="searchBlood()" class="btn btn-primary mb-3">Search</button>
 
-  <div id="results"></div>
+<div id="results"></div>
 
-  <script>
-    const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2aYOgftmgyig8mOQdQxw4prJZyAP18yM2CB2gPjyv8p3D_6kgvbOfipPoDgb_oh3DN-_8os6j84Uo/pub?output=csv';
+<script>
+  const csvUrl = 'YOUR_PUBLISHED_CSV_LINK_HERE'; // replace with your CSV link
+  let bloodData = [];
 
-    let bloodData = [];
-
- 
-    Tabletop.init({
-      key: publicSpreadsheetUrl,
-      callback: data => {
-        console.log(data);  
-        bloodData = data.map(d => ({
-          name: d.Name,
-          type: d.Type,
-          bloodType: d['Blood Type'],
-          contact: d.Contact,
-          location: d.Location,
-          entryTime: d['Entry Time']
-        }));
-      },
-      simpleSheet: true
-    });
-
-    function searchBlood() {
-      const type = document.getElementById('bloodType').value;
-      if (!type) return alert('Please select a blood type');
-
-      const matches = bloodData.filter(d => d.bloodType === type);
-
-      const resultsDiv = document.getElementById('results');
-      if(matches.length === 0){
-        resultsDiv.innerHTML = '<p>No donors found.</p>';
-        return;
-      }
-
-      let html = '<ul class="list-group">';
-      matches.forEach(d => {
-        html += `<li class="list-group-item">
-                  <strong>${d.name}</strong> <br>
-                  ${d.type} - ${d.location} <br>
-                  Contact: <a href="tel:${d.contact}">${d.contact}</a>
-                  <small>Added on: ${d.entryTime}</small>
-                 </li>`;
-      });
-      html += '</ul>';
-
-      resultsDiv.innerHTML = html;
+  // Load CSV from Google Sheets
+  Papa.parse(csvUrl, {
+    download: true,
+    header: true,
+    complete: function(results) {
+      bloodData = results.data;
+      console.log('Loaded data:', bloodData);
     }
-  </script>
+  });
+
+  function searchBlood() {
+    const type = document.getElementById('bloodType').value;
+    if (!type) return alert('Please select a blood type');
+
+    const matches = bloodData.filter(d => d['Blood Type'] === type);
+
+    const resultsDiv = document.getElementById('results');
+    if(matches.length === 0){
+      resultsDiv.innerHTML = '<p>No donors found.</p>';
+      return;
+    }
+
+    let html = '<ul class="list-group">';
+    matches.forEach(d => {
+      html += `<li class="list-group-item">
+                <strong>${d.Name}</strong> <br>
+                ${d.Type} - ${d.Location} <br>
+                Contact: <a href="tel:${d.Contact}">${d.Contact}</a>
+                <small>Added on: ${d['Entry Time']}</small>
+               </li>`;
+    });
+    html += '</ul>';
+
+    resultsDiv.innerHTML = html;
+  }
+</script>
 
 </body>
 </html>

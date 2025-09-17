@@ -1,17 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Donor Database Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Lookup</title>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+      color: #d32f2f;
+    }
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    #table_div {
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>🩸 Donor Lookup</h2>
+  <label for="bloodType">Choose Blood Type:</label>
+  <select id="bloodType" onchange="drawTable()">
+    <option value="">-- All Types --</option>
+    <option value="A+">A+</option>
+    <option value="A-">A-</option>
+    <option value="B+">B+</option>
+    <option value="B-">B-</option>
+    <option value="AB+">AB+</option>
+    <option value="AB-">AB-</option>
+    <option value="O+">O+</option>
+    <option value="O-">O-</option>
+  </select>
+  <div id="table_div"></div>
+
+  <script>
     google.charts.load('current', {'packages':['table']});
     google.charts.setOnLoadCallback(drawTable);
 
     function drawTable() {
-      const queryString = encodeURIComponent('SELECT A, B, C');
+      const selectedType = document.getElementById('bloodType').value;
+      let queryStr = 'SELECT A, B, C'; // Assuming C is blood type
+
+      if (selectedType) {
+        queryStr += ` WHERE C = '${selectedType}'`;
+      }
+
       const sheetID = '1Prck0zjCMJh8JC3yZm18Wxt5g-1-359nx5lIaynJv6A';
       const query = new google.visualization.Query(
-        `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Sheet1&tq=${queryString}`
+        `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Sheet1&tq=${encodeURIComponent(queryStr)}`
       );
 
       query.send(response => {
@@ -21,9 +66,5 @@
       });
     }
   </script>
-</head>
-<body>
-  <h2>🩸 Donor Database</h2>
-  <div id="table_div"></div>
 </body>
 </html>

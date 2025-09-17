@@ -80,6 +80,12 @@
   .cta-link:hover {
     text-decoration: underline;
   }
+
+  #donorList p {
+    text-align: center;
+    color: #666;
+    margin-top: 1rem;
+  }
 </style>
 </head>
 <body>
@@ -87,9 +93,9 @@
 <h1>🩸 Blood Donor Finder</h1>
 
 <div class="filter-section">
-  <label for="bloodType">Filter by Blood Type:</label>
+  <label for="bloodType">Select Blood Type:</label>
   <select id="bloodType" onchange="drawDonors()">
-    <option value="">-- All Types --</option>
+    <option value="">-- Select a Blood Type --</option>
     <option value="A+">A+</option>
     <option value="A-">A-</option>
     <option value="B+">B+</option>
@@ -101,7 +107,9 @@
   </select>
 </div>
 
-<div id="donorList"></div>
+<div id="donorList">
+  <p>Please select a blood type to see donors.</p>
+</div>
 
 <a href="https://forms.gle/Yb76YVtzJ6EyYXVZ7" class="cta-link">Register as Donor</a>
 
@@ -134,10 +142,15 @@ function drawDonors() {
   const donorListDiv = document.getElementById('donorList');
   donorListDiv.innerHTML = '';
 
-  const filtered = filter ? allDonors.filter(d => d.BloodType === filter) : allDonors;
+  if (!filter) {
+    donorListDiv.innerHTML = '<p>Please select a blood type to see donors.</p>';
+    return;
+  }
+
+  const filtered = allDonors.filter(d => d.BloodType === filter);
 
   if (filtered.length === 0) {
-    donorListDiv.innerHTML = '<p style="text-align:center;">No donors found.</p>';
+    donorListDiv.innerHTML = `<p>No ${filter} donors found.</p>`;
     return;
   }
 
@@ -158,7 +171,7 @@ function drawDonors() {
 }
 
 google.charts.load('current', {'packages':['table']});
-google.charts.setOnLoadCallback(() => fetchDonors(drawDonors));
+google.charts.setOnLoadCallback(() => fetchDonors());
 </script>
 
 </body>

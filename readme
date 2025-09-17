@@ -1,0 +1,78 @@
+# 🩸 Blood Donor Finder
+
+**A web app to connect blood donors with people in need in real time.**
+
+---
+
+## 🌟 Project Overview
+
+Blood emergencies can happen anytime, and finding the right donor quickly is critical.  
+**Blood Donor Finder** is a lightweight, user-friendly web app that allows:
+
+- Donors to register their blood type and contact information.  
+- Seekers to filter donors by blood type and reach out immediately.  
+- Fast connection without relying on outdated blood bank records.  
+
+**Inspiration:** This project was inspired during the **Nepali Gen Z protests**, when many people urgently needed blood but blood banks were not updated or accessible. It was built to **bridge the gap between donors and seekers quickly and efficiently**.
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** HTML, CSS (Bootstrap 5), JavaScript  
+- **Data Source:** Google Sheets (as a lightweight database)  
+- **Hosting:** GitHub Pages  
+- **Responsive Design:** Works on desktop and mobile devices  
+
+---
+
+## ⚡ Features
+
+- **Filter by blood type** – find the right donor instantly.  
+- **Clickable phone links** – call donors directly from the web page.  
+- **Color-coded blood badges** – visually identify blood types quickly.  
+- **Register as a donor** – seamless form integration using Google Forms.  
+- **Mobile-friendly layout** – flexible and responsive design.  
+
+---
+
+## 📂 Usage
+
+1. Visit the live site: [Blood Donor Finder](https://adityastha.github.io/blooddonorfinder/)  
+2. Select a blood type from the dropdown.  
+3. View matching donors and contact them instantly via phone.  
+4. Want to donate? Click **“Register as Donor”** to fill out the form.  
+
+---
+
+## 💡 Future Improvements
+
+- Add **city/location filter** for nearby donors.  
+- Implement **last donation date** to improve eligibility info.  
+- Add **notifications** for urgent blood requests.  
+- Integrate a **real database** (Firebase, Airtable) for scalability.  
+
+---
+
+## 📈 Impact
+
+Even in its MVP version, Blood Donor Finder has the potential to:
+
+- Reduce time to connect donors with seekers.  
+- Increase participation of volunteers in local communities.  
+- Serve as a foundation for a larger, nationwide blood donation network.  
+
+---
+
+## 🔗 Contributing
+
+This is an open project for social good.  
+- Fork the repo, make changes, and submit a PR.  
+- Ideas and improvements are welcome, especially in UI/UX or data management.  
+
+---
+
+## 📜 License
+
+This project is **open-source** under the MIT License.  
+

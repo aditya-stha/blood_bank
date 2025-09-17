@@ -1,47 +1,43 @@
-<script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/src/tabletop.min.js"></script>
-<script>
-  const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2aYOgftmgyig8mOQdQxw4prJZyAP18yM2CB2gPjyv8p3D_6kgvbOfipPoDgb_oh3DN-_8os6j84Uo/pubhtml?gid=0&single=true';
-  let bloodData = [];
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blood Donor Finder</title>
+</head>
+<body>
+  <h1>Find Blood Donors</h1>
+  <label for="bloodType">Enter Blood Type:</label>
+  <input id="bloodType" type="text">
+  <button onclick="searchDonors()">Search</button>
 
-  Tabletop.init({
-    key: publicSpreadsheetUrl,
-    simpleSheet: true,
-    callback: function(data) {
-      bloodData = data.map(d => ({
-        Name: d.Name.trim(),
-        Type: d.Type.trim(),
-        BloodType: d['Blood Type'].trim(),
-        Contact: d.Contact.trim(),
-        Location: d.Location.trim(),
-        EntryTime: d['Entry Time'].trim()
-      }));
-      console.log('Loaded data:', bloodData);
+  <h2>Donors:</h2>
+  <ul id="donorList"></ul>
+
+  <button onclick="register()">Register as Donor</button>
+
+  <script>
+    const apiURL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
+
+    function searchDonors() {
+      const bloodType = document.getElementById("bloodType").value;
+      fetch(`${apiURL}?bloodType=${bloodType}`)
+        .then(response => response.json())
+        .then(data => {
+          const list = document.getElementById("donorList");
+          list.innerHTML = '';
+          if(data.length === 0){
+            list.innerHTML = '<li>No donors found</li>';
+          }
+          data.forEach(donor => {
+            const li = document.createElement('li');
+            li.textContent = `${donor.Name} - ${donor.Phone} - ${donor.City}`;
+            list.appendChild(li);
+          });
+        });
     }
-  });
 
-  function searchBlood() {
-    const type = document.getElementById('bloodType').value;
-    if (!type) return alert('Please select a blood type');
-
-    const matches = bloodData.filter(d => d.BloodType === type);
-
-    const resultsDiv = document.getElementById('results');
-    if (matches.length === 0) {
-      resultsDiv.innerHTML = '<p>No donors found.</p>';
-      return;
+    function register() {
+      window.open("YOUR_GOOGLE_FORM_URL", "_blank");
     }
-
-    let html = '<ul class="list-group">';
-    matches.forEach(d => {
-      html += `<li class="list-group-item">
-                <strong>${d.Name}</strong> <br>
-                ${d.Type} - ${d.Location} <br>
-                Contact: <a href="tel:${d.Contact}">${d.Contact}</a>
-                <small>Added on: ${d.EntryTime}</small>
-               </li>`;
-    });
-    html += '</ul>';
-
-    resultsDiv.innerHTML = html;
-  }
-</script>
+  </script>
+</body>
+</html>

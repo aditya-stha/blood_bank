@@ -151,7 +151,7 @@ function drawDonors() {
   const filtered = allDonors.filter(d => d.BloodType === filter);
 
   if (filtered.length === 0) {
-    donorListDiv.innerHTML = `<p>No ${filter} donors found.</p>`;>;
+    donorListDiv.innerHTML = `<p>No ${filter} donors found.</p>`;
     return;
   }
 

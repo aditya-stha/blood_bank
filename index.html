@@ -1,101 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Donor Lookup</title>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background-color: #fff;
-      color: #333;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🩸 Blood Donor Finder</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #fafafa;
+    margin: 0;
+    padding: 1rem;
+  }
 
-    h2 {
-      text-align: center;
-      font-weight: 600;
-      color: #d32f2f;
-      margin-bottom: 1rem;
-    }
+  h1 {
+    text-align: center;
+    color: #d32f2f;
+    margin-bottom: 1.5rem;
+  }
 
-    .filter-section {
-      margin-bottom: 1rem;
-    }
+  .filter-section {
+    margin-bottom: 1rem;
+  }
 
-    select {
-      width: 100%;
-      padding: 0.6rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
+  select {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+  }
 
-    #table_div {
-      overflow-x: auto;
-    }
+  .donor-card {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
-    .cta-link {
-      display: block;
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 1rem;
-      color: #d32f2f;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  .donor-info {
+    flex: 1 1 auto;
+  }
 
-    .cta-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+  .blood-badge {
+    font-weight: bold;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .A+ { background: #ff4d4d; }
+  .A- { background: #ff6666; }
+  .B+ { background: #ffb366; }
+  .B- { background: #ffd699; }
+  .O+ { background: #66b3ff; color: #fff; }
+  .O- { background: #99ccff; color: #fff; }
+  .AB+ { background: #cc99ff; }
+  .AB- { background: #d9b3ff; }
+
+  .cta-link {
+    display: block;
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1rem;
+    color: #d32f2f;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .cta-link:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
-  <h2>🩸 Donor Lookup</h2>
 
-  <div class="filter-section">
-    <label for="bloodType">Select Blood Type:</label>
-    <select id="bloodType" onchange="drawTable()">
-      <option value="">-- All Types --</option>
-      <option value="A+">A+</option>
-      <option value="A-">A-</option>
-      <option value="B+">B+</option>
-      <option value="B-">B-</option>
-      <option value="AB+">AB+</option>
-      <option value="AB-">AB-</option>
-      <option value="O+">O+</option>
-      <option value="O-">O-</option>
-    </select>
-  </div>
+<h1>🩸 Blood Donor Finder</h1>
 
-  <div id="table_div"></div>
+<div class="filter-section">
+  <label for="bloodType">Filter by Blood Type:</label>
+  <select id="bloodType" onchange="drawDonors()">
+    <option value="">-- All Types --</option>
+    <option value="A+">A+</option>
+    <option value="A-">A-</option>
+    <option value="B+">B+</option>
+    <option value="B-">B-</option>
+    <option value="AB+">AB+</option>
+    <option value="AB-">AB-</option>
+    <option value="O+">O+</option>
+    <option value="O-">O-</option>
+  </select>
+</div>
 
-  <a href="https://forms.gle/Yb76YVtzJ6EyYXVZ7" class="cta-link">Register as Donor</a>
+<div id="donorList"></div>
 
-  <script>
-    google.charts.load('current', {'packages':['table']});
-    google.charts.setOnLoadCallback(drawTable);
+<a href="https://forms.gle/Yb76YVtzJ6EyYXVZ7" class="cta-link">Register as Donor</a>
 
-    function drawTable() {
-      const selectedType = document.getElementById('bloodType').value;
-      let queryStr = 'SELECT A, B, C'; // Assuming C is blood type
+<script>
+const sheetID = '1Prck0zjCMJh8JC3yZm18Wxt5g-1-359nx5lIaynJv6A';
+let allDonors = [];
 
-      if (selectedType) {
-        queryStr += ` WHERE C = '${selectedType}'`;
-      }
+function fetchDonors(callback) {
+  const queryStr = 'SELECT A, B, C';
+  const queryUrl = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Sheet1&tq=${encodeURIComponent(queryStr)}`;
 
-      const sheetID = '1Prck0zjCMJh8JC3yZm18Wxt5g-1-359nx5lIaynJv6A';
-      const query = new google.visualization.Query(
-        `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Sheet1&tq=${encodeURIComponent(queryStr)}`
-      );
-
-      query.send(response => {
-        const data = response.getDataTable();
-        const table = new google.visualization.Table(document.getElementById('table_div'));
-        table.draw(data, {showRowNumber: false, width: '100%', height: 'auto'});
+  const query = new google.visualization.Query(queryUrl);
+  query.send(response => {
+    const data = response.getDataTable();
+    const donors = [];
+    for (let i = 0; i < data.getNumberOfRows(); i++) {
+      donors.push({
+        Name: data.getValue(i, 0),
+        Phone: data.getValue(i, 1),
+        BloodType: data.getValue(i, 2)
       });
     }
-  </script>
+    allDonors = donors;
+    if (callback) callback();
+  });
+}
+
+function drawDonors() {
+  const filter = document.getElementById('bloodType').value;
+  const donorListDiv = document.getElementById('donorList');
+  donorListDiv.innerHTML = '';
+
+  const filtered = filter ? allDonors.filter(d => d.BloodType === filter) : allDonors;
+
+  if (filtered.length === 0) {
+    donorListDiv.innerHTML = '<p style="text-align:center;">No donors found.</p>';
+    return;
+  }
+
+  filtered.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'donor-card';
+    card.innerHTML = `
+      <div class="donor-info">
+        <strong>${d.Name}</strong><br>
+        <a href="tel:${d.Phone}">${d.Phone}</a>
+      </div>
+      <div class="blood-badge ${d.BloodType.replace('+','plus').replace('-','minus')}">
+        ${d.BloodType}
+      </div>
+    `;
+    donorListDiv.appendChild(card);
+  });
+}
+
+google.charts.load('current', {'packages':['table']});
+google.charts.setOnLoadCallback(() => fetchDonors(drawDonors));
+</script>
+
 </body>
 </html>

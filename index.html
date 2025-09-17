@@ -26,7 +26,7 @@
   <h1 class="mb-3 text-center">Blood Donor Finder</h1>
 
   <div class="mb-3">
-    <input type="text" id="bloodType" class="form-control" placeholder="Enter Blood Type e.g., A+">
+    <input type="text" id="bloodType" class="form-control" placeholder="Enter Blood Type e.g., O+">
     <button class="btn btn-primary mt-2 w-100" onclick="searchBlood()">Search Donors</button>
     <button class="btn btn-info mt-2 w-100" onclick="showAll()">Show All Donors</button>
   </div>
@@ -37,19 +37,33 @@
 </div>
 
 <script>
-const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwIRrdAwKRXOqoTfuj-O6aOBSideOlf54wIvI6v1CSJa31lg9E3RON7WqAv8yJaa5ApQprIVXIsY9Y/pubhtml?gid=450047681&single=true'; 
+const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTwIRrdAwKRXOqoTfuj-O6aOBSideOlf54wIvI6v1CSJa31lg9E3RON7WqAv8yJaa5ApQprIVXIsY9Y/pubhtml?gid=450047681&single=true'; // Replace with your published form response sheet
 let bloodData = [];
+let keys = {}; // To store actual column keys
 
 Tabletop.init({
   key: publicSpreadsheetUrl,
   simpleSheet: true,
   callback: function(data) {
+    console.log('Raw sheet data:', data); // See what Tabletop reads
+    if (data.length === 0) return;
+
+    // Automatically detect column keys
+    const firstRow = data[0];
+    for (let k in firstRow) {
+      if (k.toLowerCase().includes('name')) keys.name = k;
+      if (k.toLowerCase().includes('phone')) keys.phone = k;
+      if (k.toLowerCase().includes('blood')) keys.blood = k;
+    }
+    console.log('Detected keys:', keys);
+
+    // Map data
     bloodData = data.map(d => ({
-      Name: d.Name.trim(),
-      Phone: d.Phone.trim(),
-      BloodType: d['Blood Type'].trim()
+      Name: d[keys.name]?.trim() || '',
+      Phone: d[keys.phone]?.trim() || '',
+      BloodType: d[keys.blood]?.trim() || ''
     }));
-    console.log('Loaded data:', bloodData);
+    console.log('Mapped data:', bloodData);
   }
 });
 
@@ -99,7 +113,7 @@ function searchBlood() {
 }
 
 function register() {
-  window.open("https://docs.google.com/forms/d/e/1FAIpQLSe7QK9a2bmmE86iBhbtWKW4XYkHz2-nz5mKvFKAJyQKBIjNHg/viewform?usp=dialog", "_blank"); 
+  window.open("YOUR_GOOGLE_FORM_URL", "_blank");
 }
 </script>
 

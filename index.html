@@ -28,6 +28,7 @@
   <div class="mb-3">
     <input type="text" id="bloodType" class="form-control" placeholder="Enter Blood Type e.g., A+">
     <button class="btn btn-primary mt-2 w-100" onclick="searchBlood()">Search Donors</button>
+    <button class="btn btn-info mt-2 w-100" onclick="showAll()">Show All Donors</button>
   </div>
 
   <div id="results"></div>
@@ -52,9 +53,6 @@ Tabletop.init({
   }
 });
 
-<button class="btn btn-info mt-2 w-100" onclick="showAll()">Show All Donors</button>
-
-<script>
 function showAll() {
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
@@ -74,8 +72,6 @@ function showAll() {
     resultsDiv.appendChild(card);
   });
 }
-</script>
-
 
 function searchBlood() {
   const typeInput = document.getElementById('bloodType').value.trim().toUpperCase();
@@ -94,10 +90,9 @@ function searchBlood() {
   matches.forEach(d => {
     const card = document.createElement('div');
     card.className = 'card donor-card p-3 shadow-sm';
-
     card.innerHTML = `
       <h5>${d.Name} <span class="badge badge-blood ${d.BloodType.replace('+','plus').replace('-','minus')}">${d.BloodType}</span></h5>
-      <p>Contact: <a href="tel:${d.Phone}">${d.Phone}</a></p>
+      <p>Phone: <a href="tel:${d.Phone}">${d.Phone}</a></p>
     `;
     resultsDiv.appendChild(card);
   });

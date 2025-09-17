@@ -52,6 +52,31 @@ Tabletop.init({
   }
 });
 
+<button class="btn btn-info mt-2 w-100" onclick="showAll()">Show All Donors</button>
+
+<script>
+function showAll() {
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '';
+
+  if (bloodData.length === 0) {
+    resultsDiv.innerHTML = '<p class="text-center">No data loaded yet.</p>';
+    return;
+  }
+
+  bloodData.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'card donor-card p-3 shadow-sm';
+    card.innerHTML = `
+      <h5>${d.Name} <span class="badge badge-blood ${d.BloodType.replace('+','plus').replace('-','minus')}">${d.BloodType}</span></h5>
+      <p>Phone: <a href="tel:${d.Phone}">${d.Phone}</a></p>
+    `;
+    resultsDiv.appendChild(card);
+  });
+}
+</script>
+
+
 function searchBlood() {
   const typeInput = document.getElementById('bloodType').value.trim().toUpperCase();
   if (!typeInput) return alert('Please enter a blood type');
@@ -79,7 +104,7 @@ function searchBlood() {
 }
 
 function register() {
-  window.open("YOUR_GOOGLE_FORM_URL", "_blank"); 
+  window.open("https://docs.google.com/forms/d/e/1FAIpQLSe7QK9a2bmmE86iBhbtWKW4XYkHz2-nz5mKvFKAJyQKBIjNHg/viewform?usp=dialog", "_blank"); 
 }
 </script>
 

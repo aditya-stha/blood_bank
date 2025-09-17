@@ -1,43 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Blood Donor Finder Hi</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Donor Finder</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/src/tabletop.min.js"></script>
+<style>
+  body { padding: 15px; font-family: Arial, sans-serif; background: #f9f9f9; }
+  .donor-card { margin-bottom: 15px; }
+  .badge-blood { font-size: 0.9rem; font-weight: bold; color: white; }
+  .A+ { background: #ff4d4d; }
+  .A- { background: #ff6666; }
+  .B+ { background: #ffb366; }
+  .B- { background: #ffd699; }
+  .O+ { background: #66b3ff; }
+  .O- { background: #99ccff; }
+  .AB+ { background: #cc99ff; }
+  .AB- { background: #d9b3ff; }
+</style>
 </head>
 <body>
-  <h1>Find Blood Donors</h1>
-  <label for="bloodType">Enter Blood Type:</label>
-  <input id="bloodType" type="text">
-  <button onclick="searchDonors()">Search</button>
 
-  <h2>Donors:</h2>
-  <ul id="donorList"></ul>
+<div class="container">
+  <h1 class="mb-3 text-center">Blood Donor Finder</h1>
 
-  <button onclick="register()">Register as Donor</button>
+  <div class="mb-3">
+    <input type="text" id="bloodType" class="form-control" placeholder="Enter Blood Type e.g., A+">
+    <button class="btn btn-primary mt-2 w-100" onclick="searchBlood()">Search Donors</button>
+  </div>
 
-  <script>
-    const apiURL = "https://script.google.com/macros/s/AKfycbydWjJ9JGAs8HgA2US-F8UFzwy5TBlEtcaa4LyrIh15lqoZODr_dIyMsCB4tjdak25gRw/exec";
+  <div id="results"></div>
 
-    function searchDonors() {
-      const bloodType = document.getElementById("bloodType").value;
-      fetch(`${apiURL}?bloodType=${bloodType}`)
-        .then(response => response.json())
-        .then(data => {
-          const list = document.getElementById("donorList");
-          list.innerHTML = '';
-          if(data.length === 0){
-            list.innerHTML = '<li>No donors found</li>';
-          }
-          data.forEach(donor => {
-            const li = document.createElement('li');
-            li.textContent = `${donor.Name} - ${donor.Phone} - ${donor.City}`;
-            list.appendChild(li);
-          });
-        });
-    }
+  <button class="btn btn-success mt-4 w-100" onclick="register()">Register as Donor</button>
+</div>
 
-    function register() {
-      window.open("YOUR_GOOGLE_FORM_URL", "_blank");
-    }
-  </script>
+<script>
+const publicSpreadsheetUrl = 'YOUR_PUBLISHED_GOOGLE_SHEET_URL'; // Replace with your URL
+let bloodData = [];
+
+Tabletop.init({
+  key: publicSpreadsheetUrl,
+  simpleSheet: true,
+  callback: function(data) {
+    bloodData = data.map(d => ({
+      Name: d.Name.trim(),
+      Phone: d.Phone.trim(),
+      BloodType: d['Blood Type'].trim()
+    }));
+    console.log('Loaded data:', bloodData);
+  }
+});
+
+function searchBlood() {
+  const typeInput = document.getElementById('bloodType').value.trim().toUpperCase();
+  if (!typeInput) return alert('Please enter a blood type');
+
+  const matches = bloodData.filter(d => d.BloodType.toUpperCase() === typeInput);
+
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '';
+
+  if (matches.length === 0) {
+    resultsDiv.innerHTML = '<p class="text-center">No donors found.</p>';
+    return;
+  }
+
+  matches.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'card donor-card p-3 shadow-sm';
+
+    card.innerHTML = `
+      <h5>${d.Name} <span class="badge badge-blood ${d.BloodType.replace('+','plus').replace('-','minus')}">${d.BloodType}</span></h5>
+      <p>Contact: <a href="tel:${d.Phone}">${d.Phone}</a></p>
+    `;
+    resultsDiv.appendChild(card);
+  });
+}
+
+function register() {
+  window.open("YOUR_GOOGLE_FORM_URL", "_blank"); // Replace with your Google Form
+}
+</script>
+
 </body>
 </html>

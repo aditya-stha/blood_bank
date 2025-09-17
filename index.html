@@ -6,41 +6,72 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 1rem;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #f9f9f9;
+      padding: 1rem;
+      background-color: #fff;
+      color: #333;
     }
+
     h2 {
       text-align: center;
+      font-weight: 600;
       color: #d32f2f;
+      margin-bottom: 1rem;
     }
+
+    .filter-section {
+      margin-bottom: 1rem;
+    }
+
     select {
       width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
+      padding: 0.6rem;
       font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
     #table_div {
       overflow-x: auto;
+    }
+
+    .cta-link {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 1rem;
+      color: #d32f2f;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .cta-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h2>🩸 Donor Lookup</h2>
-  <label for="bloodType">Choose Blood Type:</label>
-  <select id="bloodType" onchange="drawTable()">
-    <option value="">-- All Types --</option>
-    <option value="A+">A+</option>
-    <option value="A-">A-</option>
-    <option value="B+">B+</option>
-    <option value="B-">B-</option>
-    <option value="AB+">AB+</option>
-    <option value="AB-">AB-</option>
-    <option value="O+">O+</option>
-    <option value="O-">O-</option>
-  </select>
+
+  <div class="filter-section">
+    <label for="bloodType">Select Blood Type:</label>
+    <select id="bloodType" onchange="drawTable()">
+      <option value="">-- All Types --</option>
+      <option value="A+">A+</option>
+      <option value="A-">A-</option>
+      <option value="B+">B+</option>
+      <option value="B-">B-</option>
+      <option value="AB+">AB+</option>
+      <option value="AB-">AB-</option>
+      <option value="O+">O+</option>
+      <option value="O-">O-</option>
+    </select>
+  </div>
+
   <div id="table_div"></div>
+
+  <a href="https://your-registration-form-link.com" class="cta-link">Register as Donor</a>
 
   <script>
     google.charts.load('current', {'packages':['table']});
@@ -62,7 +93,7 @@
       query.send(response => {
         const data = response.getDataTable();
         const table = new google.visualization.Table(document.getElementById('table_div'));
-        table.draw(data, {showRowNumber: true, width: '100%', height: 'auto'});
+        table.draw(data, {showRowNumber: false, width: '100%', height: 'auto'});
       });
     }
   </script>

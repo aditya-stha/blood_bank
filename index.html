@@ -5,19 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blood Donor Finder</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/src/tabletop.min.js"></script>
 <style>
   body { padding: 15px; font-family: Arial, sans-serif; background: #f9f9f9; }
   .donor-card { margin-bottom: 15px; }
-  .badge-blood { font-size: 0.9rem; font-weight: bold; color: white; }
-  .A+ { background: #ff4d4d; }
-  .A- { background: #ff6666; }
-  .B+ { background: #ffb366; }
-  .B- { background: #ffd699; }
-  .O+ { background: #66b3ff; }
-  .O- { background: #99ccff; }
-  .AB+ { background: #cc99ff; }
-  .AB- { background: #d9b3ff; }
 </style>
 </head>
 <body>
@@ -37,50 +27,34 @@
 </div>
 
 <script>
-const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWbUxphf1D8vVowK1LvSBdBHxObBiYuF0FkLj6F8K0j0xBlS7DlEDOmsKEi5XRQpb0dVj6iEjnFFPP/pubhtml'; // Replace with your published form response sheet
+const sheetId = 'YOUR_SHEET_ID_HERE'; // the long ID from the Google Sheet URL
+const sheetName = 'Sheet1'; // your sheet tab name
 let bloodData = [];
-let keys = {}; // To store actual column keys
 
-Tabletop.init({
-  key: publicSpreadsheetUrl,
-  simpleSheet: true,
-  callback: function(data) {
-    console.log('Raw sheet data:', data); // See what Tabletop reads
-    if (data.length === 0) return;
-
-    // Automatically detect column keys
-    const firstRow = data[0];
-    for (let k in firstRow) {
-      if (k.toLowerCase().includes('name')) keys.name = k;
-      if (k.toLowerCase().includes('phone')) keys.phone = k;
-      if (k.toLowerCase().includes('blood')) keys.blood = k;
-    }
-    console.log('Detected keys:', keys);
-
-    // Map data
-    bloodData = data.map(d => ({
-      Name: d[keys.name]?.trim() || '',
-      Phone: d[keys.phone]?.trim() || '',
-      BloodType: d[keys.blood]?.trim() || ''
+// fetch sheet as JSON
+fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`)
+  .then(res => res.text())
+  .then(rep => {
+    // remove extra chars
+    const json = JSON.parse(rep.substring(47).slice(0, -2));
+    bloodData = json.table.rows.map(r => ({
+      Name: r.c[0]?.v || '',
+      Phone: r.c[1]?.v || '',
+      BloodType: r.c[2]?.v || ''
     }));
-    console.log('Mapped data:', bloodData);
-  }
-});
+    console.log('Loaded data:', bloodData);
+  });
 
 function showAll() {
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
-
-  if (bloodData.length === 0) {
-    resultsDiv.innerHTML = '<p class="text-center">No data loaded yet.</p>';
-    return;
-  }
+  if (bloodData.length === 0) return resultsDiv.innerHTML = '<p class="text-center">No data loaded yet.</p>';
 
   bloodData.forEach(d => {
     const card = document.createElement('div');
     card.className = 'card donor-card p-3 shadow-sm';
     card.innerHTML = `
-      <h5>${d.Name} <span class="badge badge-blood ${d.BloodType.replace('+','plus').replace('-','minus')}">${d.BloodType}</span></h5>
+      <h5>${d.Name} <span>${d.BloodType}</span></h5>
       <p>Phone: <a href="tel:${d.Phone}">${d.Phone}</a></p>
     `;
     resultsDiv.appendChild(card);
@@ -95,17 +69,13 @@ function searchBlood() {
 
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
-
-  if (matches.length === 0) {
-    resultsDiv.innerHTML = '<p class="text-center">No donors found.</p>';
-    return;
-  }
+  if (matches.length === 0) return resultsDiv.innerHTML = '<p class="text-center">No donors found.</p>';
 
   matches.forEach(d => {
     const card = document.createElement('div');
     card.className = 'card donor-card p-3 shadow-sm';
     card.innerHTML = `
-      <h5>${d.Name} <span class="badge badge-blood ${d.BloodType.replace('+','plus').replace('-','minus')}">${d.BloodType}</span></h5>
+      <h5>${d.Name} <span>${d.BloodType}</span></h5>
       <p>Phone: <a href="tel:${d.Phone}">${d.Phone}</a></p>
     `;
     resultsDiv.appendChild(card);

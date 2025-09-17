@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blood Donor Finder</title>
+<title>Blood Donor List</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
   body { padding: 15px; font-family: Arial, sans-serif; background: #f9f9f9; }
@@ -13,29 +13,20 @@
 <body>
 
 <div class="container">
-  <h1 class="mb-3 text-center">Blood Donor Finder</h1>
-
-  <div class="mb-3">
-    <input type="text" id="bloodType" class="form-control" placeholder="Enter Blood Type e.g., O+">
-    <button class="btn btn-primary mt-2 w-100" onclick="searchBlood()">Search Donors</button>
-    <button class="btn btn-info mt-2 w-100" onclick="showAll()">Show All Donors</button>
-  </div>
-
+  <h1 class="mb-3 text-center">Blood Donor List</h1>
   <div id="results"></div>
-
-  <button class="btn btn-success mt-4 w-100" onclick="register()">Register as Donor</button>
 </div>
 
 <script>
-const sheetId = 'YOUR_SHEET_ID_HERE'; // the long ID from the Google Sheet URL
-const sheetName = 'Sheet1'; // your sheet tab name
+const sheetId = '1chtXAs6oxwn_3dgUFbW-_qD7tvD4_M_9j0qBk_uN6zc
+'; // replace with your sheet ID
+const sheetName = 'Sheet1'; // replace with your tab name
 let bloodData = [];
 
-// fetch sheet as JSON
+// Fetch Google Sheet as JSON
 fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`)
   .then(res => res.text())
   .then(rep => {
-    // remove extra chars
     const json = JSON.parse(rep.substring(47).slice(0, -2));
     bloodData = json.table.rows.map(r => ({
       Name: r.c[0]?.v || '',
@@ -43,12 +34,17 @@ fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sh
       BloodType: r.c[2]?.v || ''
     }));
     console.log('Loaded data:', bloodData);
+    showAll();
   });
 
 function showAll() {
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
-  if (bloodData.length === 0) return resultsDiv.innerHTML = '<p class="text-center">No data loaded yet.</p>';
+
+  if (bloodData.length === 0) {
+    resultsDiv.innerHTML = '<p class="text-center">No donors found.</p>';
+    return;
+  }
 
   bloodData.forEach(d => {
     const card = document.createElement('div');
@@ -59,31 +55,6 @@ function showAll() {
     `;
     resultsDiv.appendChild(card);
   });
-}
-
-function searchBlood() {
-  const typeInput = document.getElementById('bloodType').value.trim().toUpperCase();
-  if (!typeInput) return alert('Please enter a blood type');
-
-  const matches = bloodData.filter(d => d.BloodType.toUpperCase() === typeInput);
-
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '';
-  if (matches.length === 0) return resultsDiv.innerHTML = '<p class="text-center">No donors found.</p>';
-
-  matches.forEach(d => {
-    const card = document.createElement('div');
-    card.className = 'card donor-card p-3 shadow-sm';
-    card.innerHTML = `
-      <h5>${d.Name} <span>${d.BloodType}</span></h5>
-      <p>Phone: <a href="tel:${d.Phone}">${d.Phone}</a></p>
-    `;
-    resultsDiv.appendChild(card);
-  });
-}
-
-function register() {
-  window.open("YOUR_GOOGLE_FORM_URL", "_blank");
 }
 </script>
 

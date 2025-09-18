@@ -138,6 +138,10 @@ function fetchDonors(callback) {
   });
 }
 
+function getBadgeClass(bloodType) {
+  return bloodType.trim().replace('+','plus').replace('-','minus');
+}
+
 function drawDonors() {
   const filter = document.getElementById('bloodType').value;
   const donorListDiv = document.getElementById('donorList');

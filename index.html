@@ -59,14 +59,14 @@
     text-align: center;
   }
 
-  .A+ { background: #ff4d4d; }
-  .A- { background: #ff6666; }
-  .B+ { background: #ffb366; }
-  .B- { background: #ffd699; }
-  .O+ { background: #66b3ff; color: #fff; }
-  .O- { background: #99ccff; color: #fff; }
-  .AB+ { background: #cc99ff; }
-  .AB- { background: #d9b3ff; }
+  .Aplus { background: #ff4d4d; }
+  .Aminus { background: #ff6666; }
+  .Bplus { background: #ffb366; }
+  .Bminus { background: #ffd699; }
+  .Oplus { background: #66b3ff; color: #fff; }
+  .Ominus { background: #99ccff; color: #fff; }
+  .ABplus { background: #cc99ff; }
+  .ABminus { background: #d9b3ff; }
 
   .cta-link {
     display: block;
@@ -163,7 +163,7 @@ function drawDonors() {
        <strong>${d.Name}</strong><br>
        <a href="tel:${d.Phone}">${d.Phone}</a>
      </div>
-     <div class="blood-badge ${d.BloodType}">
+     <div class="blood-badge ${getBadgeClass(d.BloodType)}">
        ${d.BloodType}
      </div>
    `;

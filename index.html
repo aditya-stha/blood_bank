@@ -156,19 +156,19 @@ function drawDonors() {
   }
 
   filtered.forEach(d => {
-    const card = document.createElement('div');
-    card.className = 'donor-card';
-    card.innerHTML = `
-      <div class="donor-info">
-        <strong>${d.Name}</strong><br>
-        <a href="tel:${d.Phone}">${d.Phone}</a>
-      </div>
-      <div class="blood-badge ${d.BloodType.replace('+','plus').replace('-','minus')}">
-        ${d.BloodType}
-      </div>
-    `;
-    donorListDiv.appendChild(card);
-  });
+   const card = document.createElement('div');
+   card.className = 'donor-card';
+   card.innerHTML = `
+     <div class="donor-info">
+       <strong>${d.Name}</strong><br>
+       <a href="tel:${d.Phone}">${d.Phone}</a>
+     </div>
+     <div class="blood-badge ${d.BloodType}">
+       ${d.BloodType}
+     </div>
+   `;
+   donorListDiv.appendChild(card);
+ });
 }
 
 google.charts.load('current', {'packages':['table']});
